@@ -170,11 +170,11 @@ Planned for interactive pipeline creation and monitoring.***
 ---
 
 ### 🔜 Roadmap
- [X] Count-based tumbling/sliding windows
+ [x] Count-based tumbling/sliding windows
 
- [X] Time-based tumbling/sliding windows
+ [x] Time-based tumbling/sliding windows
 
- [X] Watermark & late event support
+ [x] Watermark & late event support
 
  [ ] DB & Kafka sources/sinks
 
