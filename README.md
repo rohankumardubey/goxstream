@@ -12,10 +12,11 @@ GoXStream supports dynamic job definitions via REST API and is ready for integra
 
 - **Dynamic pipeline definition via REST API**
 - **Event-time tumbling & sliding windows**
-- **Watermark/late event support** (true stream semantics)
-- **Chaining map, filter, reduce operators**
-- **CSV file source/sink (DB/Kafka coming soon)**
-- **Ready for React UI dashboard integration**
+- **Pluggable sources & sinks:** file, database (Postgres), Kafka
+- **Chaining of operators:** map, filter, reduce, window (tumbling, sliding, time-based, watermark)
+- **Event-time semantics, late event/watermark support**
+- **Easy to add more operators and connectors**
+- **Ready for future: React UI integration**
 - **Easy extension: Add custom operators and connectors**
 
 ---
@@ -30,7 +31,7 @@ cd goxstream
 go mod tidy
 ```
 ### 2. Prepare Input Data
-***Place an example input.csv in the project root:***
+***Place an example input.csv in the project root for the :***
 
 ```bash
 id,name,city
@@ -48,10 +49,38 @@ id,name,city
 go run ./cmd/goxstream/main.go
 ```
 
-### 4. Submit a Pipeline Job
+### 4. Submit a Pipeline Job (file → file example)
+
+```bash
+curl -X POST http://localhost:8080/jobs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "source": { "type": "file", "path": "input.csv" },
+    "operators": [{ "type": "map", "params": { "col": "processed", "val": "yes" } }],
+    "sink": { "type": "file", "path": "output.csv" }
+  }'
+
+```
+
+### 5. Submit a Pipeline Job
 ***Use curl or Postman to submit a dynamic pipeline (example: sliding window reduce):***
 ***a. Regular time window:***
 
+***Input.csv file for both below time_window and time_window_watermark***
+
+```bash
+id,name,city,score,timestamp
+1,Alice,London,10,2024-07-04T15:00:00Z
+2,Bob,Berlin,15,2024-07-04T15:00:05Z
+3,Charlie,Paris,12,2024-07-04T15:00:08Z
+4,David,Berlin,8,2024-07-04T15:00:12Z
+5,Eve,Paris,14,2024-07-04T15:00:16Z
+6,Frank,London,11,2024-07-04T15:00:22Z
+7,Grace,Berlin,9,2024-07-04T15:00:29Z
+8,Harry,Paris,13,2024-07-04T15:00:35Z
+9,Ivy,London,17,2024-07-04T15:00:41Z
+10,Jack,Berlin,16,2024-07-04T15:00:43Z
+```
 
 ```bash
 curl -X POST http://localhost:8080/jobs \
@@ -95,13 +124,22 @@ curl -X POST http://localhost:8080/jobs \
     ],
     "sink": { "type": "file", "path": "output.csv" }
   }'
-
 ```
+
 ***Your results will be in output.csv with a window_id column.***
+
+```bash
+city,count,window_end,window_id
+London,1,2024-07-04T15:00:10Z,1
+Berlin,1,2024-07-04T15:00:10Z,1
+Paris,1,2024-07-04T15:00:10Z,1
+...
+```
 
 ---
 
 ### 🛠️ Architecture
+
 ```bash
 [Source] --> [Map] --> [Filter] --> [Window/Reduce] --> [Sink]
    |            |         |           |                   |
@@ -114,6 +152,7 @@ curl -X POST http://localhost:8080/jobs \
 ***REST API: Accepts JSON job specs, launches pipeline as background Go routines.***
 
 ---
+
 ### 📝 JSON Job Spec
 ***A pipeline is defined by a simple JSON:***
 
@@ -137,9 +176,7 @@ curl -X POST http://localhost:8080/jobs \
   ],
   "sink": {"type": "file", "path": "output.csv"}
 }
-
 ```
-
 
 ---
 
@@ -176,7 +213,7 @@ Planned for interactive pipeline creation and monitoring._
 
 - [x] Watermark & late event support
 
-- [ ] DB & Kafka sources/sinks
+- [x] DB & Kafka sources/sinks
 
 - [ ] React UI dashboard
 
@@ -186,10 +223,8 @@ Planned for interactive pipeline creation and monitoring._
 
 ---
 
-
- ### 🙌 Contributing
+### 🙌 Contributing
 ***PRs, issues, and ideas are welcome!
 Fork and submit improvements or new features—let’s build a great Go stream engine together!***
-
 
 ### GoXStream — Streaming, the Go way! 🚀
