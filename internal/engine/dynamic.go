@@ -27,33 +27,37 @@ func BuildAndRunPipeline(spec model.PipelineSpec) error {
     // Run pipeline in background
     go func() {
         pipeline.Run(input, output)
-		// FLUSH LOGIC: Check if the last operator is a TimeWindowOperator, call Flush
-		if len(pipeline.Operators) > 0 {
-			if tsw, ok := pipeline.Operators[len(pipeline.Operators)-1].(*operator.TimeSlidingWindowOperator); ok {
-            	for _, evt := range tsw.Flush() {
-                output <- evt
-            	}
-        	}
-			// Import your operator package, and check type:
-			if tw, ok := pipeline.Operators[len(pipeline.Operators)-1].(*operator.TimeWindowOperator); ok {
-				for _, evt := range tw.Flush() {
-					output <- evt
-				}
-			}
-		}
+        // FLUSH LOGIC: Check if the last operator is a TimeWindowOperator, call Flush
+        if len(pipeline.Operators) > 0 {
+            if tsw, ok := pipeline.Operators[len(pipeline.Operators)-1].(*operator.TimeSlidingWindowOperator); ok {
+                for _, evt := range tsw.Flush() {
+                    output <- evt
+                }
+            }
+            if tw, ok := pipeline.Operators[len(pipeline.Operators)-1].(*operator.TimeWindowOperator); ok {
+                for _, evt := range tw.Flush() {
+                    output <- evt
+                }
+            }
+        }
         close(output)
     }()
 
-    // Sink
-    go func() {
-        sink.FileSink(spec.Sink.Path, output)
-    }()
+    // Sink (still hardcoded to file for now)
+	go func() {
+		err := sink.BuildSink(spec.Sink.Raw, output)
+		if err != nil {
+			// Optionally: handle or log the error
+			fmt.Println("sink error:", err)
+		}
+	}()
 
-    // Source
-    switch spec.Source.Type {
-    case "file":
-        return source.FileSource(spec.Source.Path, input)
-    default:
-        return fmt.Errorf("unsupported source type: %s", spec.Source.Type)
+
+    // --------- Source (dynamic!) ----------
+    // We assume spec.Source.Raw is a map[string]interface{} with the full source config.
+    // If not, adjust according to how you parse your job/pipeline spec.
+    if spec.Source.Raw == nil {
+        return fmt.Errorf("source config missing: spec.Source.Raw is nil")
     }
+    return source.BuildSource(spec.Source.Raw, input)
 }

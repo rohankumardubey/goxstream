@@ -9,6 +9,7 @@ type PipelineSpec struct {
 type SourceSpec struct {
     Type string `json:"type"` // e.g., "file"
     Path string `json:"path"`
+	Raw map[string]interface{} `json:"-"`
 }
 
 type OperatorSpec struct {
@@ -19,4 +20,5 @@ type OperatorSpec struct {
 type SinkSpec struct {
     Type string `json:"type"` // e.g., "file"
     Path string `json:"path"`
+	Raw map[string]interface{} `json:"-"`
 }
