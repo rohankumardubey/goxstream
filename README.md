@@ -8,20 +8,15 @@ GoXStream supports dynamic job definitions via REST API and is ready for integra
 
 ## ✨ Features
 
-- **Stream Processing Engine:**
-  Compose pipelines with map, filter, reduce, windowing, and more.
-- **Windowing:**
-  Support for Tumbling (fixed) and Sliding (overlapping) windows.
-- **Dynamic Pipelines:**
-  Submit and run jobs dynamically via REST API using JSON job specs—no code changes needed!
-- **File Source & Sink:**
-  Reads/writes CSV files; ready for DB/Kafka connectors.
-- **Checkpoint-Ready:**
-  Extensible for fault tolerance (future).
-- **Designed for UI:**
-  React frontend planned for interactive job design and monitoring.
-- **Easily Extensible:**
-  Add new operators and sources/sinks with simple Go interfaces.
+## Features
+
+- **Dynamic pipeline definition via REST API**
+- **Event-time tumbling & sliding windows**
+- **Watermark/late event support** (true stream semantics)
+- **Chaining map, filter, reduce operators**
+- **CSV file source/sink (DB/Kafka coming soon)**
+- **Ready for React UI dashboard integration**
+- **Easy extension: Add custom operators and connectors**
 
 ---
 
@@ -55,29 +50,53 @@ go run ./cmd/goxstream/main.go
 
 ### 4. Submit a Pipeline Job
 ***Use curl or Postman to submit a dynamic pipeline (example: sliding window reduce):***
+***a. Regular time window:***
+
+
 ```bash
 curl -X POST http://localhost:8080/jobs \
   -H "Content-Type: application/json" \
   -d '{
-    "source": {"type": "file", "path": "input.csv"},
+    "source": { "type": "file", "path": "input.csv" },
     "operators": [
       {
-        "type": "sliding_window",
+        "type": "time_window",
         "params": {
-          "size": 3,
-          "step": 1,
+          "duration": "10s",
           "inner": {
             "type": "reduce",
-            "params": {"key": "city", "agg": "count"}
+            "params": { "key": "city", "agg": "count" }
           }
         }
       }
     ],
-    "sink": {"type": "file", "path": "output.csv"}
+    "sink": { "type": "file", "path": "output.csv" }
+  }'
+```
+
+***b. Time window with watermark/late event support:***
+```bash
+curl -X POST http://localhost:8080/jobs \
+  -H "Content-Type: application/json" \
+  -d '{
+    "source": { "type": "file", "path": "input.csv" },
+    "operators": [
+      {
+        "type": "time_window_watermark",
+        "params": {
+          "duration": "10s",
+          "allowed_lateness": "5s",
+          "inner": {
+            "type": "reduce",
+            "params": { "key": "city", "agg": "count" }
+          }
+        }
+      }
+    ],
+    "sink": { "type": "file", "path": "output.csv" }
   }'
 
 ```
-
 ***Your results will be in output.csv with a window_id column.***
 
 ---
@@ -151,17 +170,19 @@ Planned for interactive pipeline creation and monitoring.***
 ---
 
 ### 🔜 Roadmap
- [ ] Database & Kafka source/sink connectors
+ [X] Count-based tumbling/sliding windows
 
- [ ] Time-based windowing
+ [X] Time-based tumbling/sliding windows
 
- [ ] Checkpointing & recovery
+ [X] Watermark & late event support
 
- [ ] Interactive React UI dashboard
+ [ ] DB & Kafka sources/sinks
 
- [ ] More aggregations: sum, avg, min, max, etc.
+ [ ] React UI dashboard
 
- [ ] Job monitoring/status endpoints
+ [ ] More aggregations: sum, avg, min, max
+
+ [ ] State, session windows, custom UDFs
 
 ---
 

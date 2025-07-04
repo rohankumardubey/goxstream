@@ -27,6 +27,20 @@ func BuildAndRunPipeline(spec model.PipelineSpec) error {
     // Run pipeline in background
     go func() {
         pipeline.Run(input, output)
+		// FLUSH LOGIC: Check if the last operator is a TimeWindowOperator, call Flush
+		if len(pipeline.Operators) > 0 {
+			if tsw, ok := pipeline.Operators[len(pipeline.Operators)-1].(*operator.TimeSlidingWindowOperator); ok {
+            	for _, evt := range tsw.Flush() {
+                output <- evt
+            	}
+        	}
+			// Import your operator package, and check type:
+			if tw, ok := pipeline.Operators[len(pipeline.Operators)-1].(*operator.TimeWindowOperator); ok {
+				for _, evt := range tw.Flush() {
+					output <- evt
+				}
+			}
+		}
         close(output)
     }()
 

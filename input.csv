@@ -1,6 +1,11 @@
-id,name,city
-1,Alice,London
-2,Bob,Berlin
-3,Charlie,Paris
-4,David,Berlin
-5,Eve,Berlin
+id,name,city,timestamp
+1,Alice,London,2024-07-04T15:00:00Z
+2,Bob,Berlin,2024-07-04T15:00:05Z
+3,Charlie,Paris,2024-07-04T15:00:08Z
+4,David,Berlin,2024-07-04T15:00:12Z
+5,Eve,Paris,2024-07-04T15:00:16Z
+6,Frank,London,2024-07-04T15:00:22Z
+7,Grace,Berlin,2024-07-04T15:00:29Z
+8,Harry,Paris,2024-07-04T15:00:35Z
+9,Ivy,London,2024-07-04T15:00:41Z
+10,Jack,Berlin,2024-07-04T15:00:43Z
