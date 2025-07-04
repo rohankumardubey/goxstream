@@ -1,0 +1,8 @@
+city,count,window_id
+London,1,1
+Berlin,1,1
+Paris,1,1
+Berlin,2,2
+Paris,1,2
+Paris,1,3
+Berlin,2,3
