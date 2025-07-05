@@ -1,23 +1,22 @@
 # GoXStream
 
-**GoXStream** is a modern, extensible real-time streaming engine built in Go, inspired by Apache Flink.
-It enables processing and transforming streaming data with powerful, configurable pipelines using operators like map, filter, reduce, and both tumbling and sliding windows.
-GoXStream supports dynamic job definitions via REST API and is ready for integration with a React UI dashboard.
+GoXStream is an open-source, Flink-inspired **stream processing engine written in Go**—with a beautiful React dashboard for visual pipeline design, job submission, and history.
+Build and run real-time data pipelines with file, database, or Kafka sources and sinks.
+
+![GoXStream Dashboard Screenshot](./docs/screenshot-dashboard.png)
+![Visual Designer Screenshot](./docs/screenshot-designer.png)
 
 ---
 
-## ✨ Features
+## 🚀 Features
 
-## Features
-
-- **Dynamic pipeline definition via REST API**
-- **Event-time tumbling & sliding windows**
-- **Pluggable sources & sinks:** file, database (Postgres), Kafka
-- **Chaining of operators:** map, filter, reduce, window (tumbling, sliding, time-based, watermark)
-- **Event-time semantics, late event/watermark support**
-- **Easy to add more operators and connectors**
-- **Ready for future: React UI integration**
-- **Easy extension: Add custom operators and connectors**
+- **Modular pipeline engine (in Go):** Compose pipelines from map, filter, reduce, window, time-window, and more
+- **Dynamic REST API:** Submit pipelines and configure sources, sinks, operators via JSON
+- **Pluggable sources/sinks:** File, Postgres, Kafka (more coming)
+- **Windowing:** Tumbling, sliding, time-based, with watermark and late event support
+- **Stateful operators and checkpointing** (coming soon!)
+- **React dashboard:** Visual DAG pipeline builder (drag/drop), job submission, job history, JSON preview
+- **Persistent job history (localStorage and soon, backend)**
 
 ---
 
@@ -30,7 +29,9 @@ git clone https://github.com/YOUR_GITHUB_USERNAME/goxstream.git
 cd goxstream
 go mod tidy
 ```
+
 ### 2. Prepare Input Data
+
 ***Place an example input.csv in the project root for the :***
 
 ```bash
@@ -45,11 +46,85 @@ id,name,city
 ```
 
 ### 3. Run the API Server
+
 ```bash
 go run ./cmd/goxstream/main.go
 ```
 
-### 4. Submit a Pipeline Job (file → file example)
+### 4. Open the React dashboard
+
+```bash
+cd goxstream-dashboard
+npm install
+npm start
+```
+
+### 5. 🧩 Example: Submit a Pipeline via UI or REST
+
+_**Simple Map:**_
+
+```bash
+{
+  "source": { "type": "file", "path": "input.csv" },
+  "operators": [
+    { "type": "map", "params": { "col": "processed", "val": "yes" } }
+  ],
+  "sink": { "type": "file", "path": "output.csv" }
+}
+```
+
+_**Windowed Reduce:**_
+
+```bash
+{
+  "source": { "type": "file", "path": "input.csv" },
+  "operators": [
+    {
+      "type": "time_window",
+      "params": {
+        "duration": "10s",
+        "inner": {
+          "type": "reduce",
+          "params": { "key": "city", "agg": "count" }
+        }
+      }
+    }
+  ],
+  "sink": { "type": "file", "path": "output.csv" }
+}
+```
+
+_**With Watermark/Late Event Support:**_
+
+```bash
+{
+  "source": { "type": "file", "path": "input.csv" },
+  "operators": [
+    {
+      "type": "time_window_watermark",
+      "params": {
+        "duration": "10s",
+        "allowed_lateness": "5s",
+        "inner": {
+          "type": "reduce",
+          "params": { "key": "city", "agg": "count" }
+        }
+      }
+    }
+  ],
+  "sink": { "type": "file", "path": "output.csv" }
+}
+```
+---
+
+### 🖥️ Visual Pipeline Designer (UI)
+- GoXStream’s UI lets you visually build pipelines (drag/drop), edit operator parameters, and export as JSON to run jobs.
+
+- Submitted jobs and their configs are saved in a beautiful job history.
+
+---
+
+### 6. Submit a Pipeline Job (file → file example) via CURL
 
 ```bash
 curl -X POST http://localhost:8080/jobs \
@@ -62,7 +137,10 @@ curl -X POST http://localhost:8080/jobs \
 
 ```
 
-### 5. Submit a Pipeline Job
+---
+
+### 7. Submit a Pipeline Job
+
 ***Use curl or Postman to submit a dynamic pipeline (example: sliding window reduce):***
 ***a. Regular time window:***
 
@@ -81,6 +159,8 @@ id,name,city,score,timestamp
 9,Ivy,London,17,2024-07-04T15:00:41Z
 10,Jack,Berlin,16,2024-07-04T15:00:43Z
 ```
+
+***a. Time window with reduce event support:***
 
 ```bash
 curl -X POST http://localhost:8080/jobs \
@@ -104,6 +184,7 @@ curl -X POST http://localhost:8080/jobs \
 ```
 
 ***b. Time window with watermark/late event support:***
+
 ```bash
 curl -X POST http://localhost:8080/jobs \
   -H "Content-Type: application/json" \
@@ -154,6 +235,7 @@ Paris,1,2024-07-04T15:00:10Z,1
 ---
 
 ### 📝 JSON Job Spec
+
 ***A pipeline is defined by a simple JSON:***
 
 ```bash
@@ -195,31 +277,42 @@ Paris,1,2024-07-04T15:00:10Z,1
 ---
 
 ### 🧑‍💻 Extending GoXStream
+
 _Add New Operators:
+
 Implement the Operator interface and add a factory to the operator registry._
 
 _Support New Sources/Sinks:
+
 Implement a Source or Sink interface in internal/source or internal/sink._
 
 _React UI Integration:
+
 Planned for interactive pipeline creation and monitoring._
 
 ---
 
 ### 🔜 Roadmap
-- [x] Count-based tumbling/sliding windows
 
-- [x] Time-based tumbling/sliding windows
+- [x] Dynamic operator/source/sink registry
 
-- [x] Watermark & late event support
+- [x] File/DB/Kafka connectors
 
-- [x] DB & Kafka sources/sinks
+- [x] REST API & React UI for pipeline design and monitoring
 
-- [ ] React UI dashboard
+- [x] Visual DAG editor with drag/drop (reactflow)
 
-- [ ] More aggregations: sum, avg, min, max
+- [x] Windowing and watermark support
 
-- [ ] State, session windows, custom UDFs
+- [x] Persistent job history (localStorage)
+
+- [ ] Checkpoint and fault-tolerance (coming next)
+
+- [ ] Backend job monitoring/status APIs
+
+- [ ] Multi-job/cluster execution
+
+- [ ] More analytics and ML operators
 
 ---
 

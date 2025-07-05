@@ -14,6 +14,16 @@ func StartAPIServer(addr string) error {
 }
 
 func jobHandler(w http.ResponseWriter, r *http.Request) {
+
+	// CORS: allow all
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    if r.Method == "OPTIONS" {
+        w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+        w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+        w.WriteHeader(http.StatusOK)
+        return
+    }
+
     if r.Method != "POST" {
         http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
         return
