@@ -1,5 +1,12 @@
 # GoXStream
 
+[![Go](https://img.shields.io/badge/Go-1.19+-00ADD8?logo=go)](https://golang.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a570b1cc-849f-4646-bd36-915fccb33736" alt="GoXstream" width="500"/>
+</p>
+
 GoXStream is an open-source, Flink-inspired **stream processing engine written in Go**—with a beautiful React dashboard for visual pipeline design, job submission, and history.
 Build and run real-time data pipelines with file, database, or Kafka sources and sinks.
 
