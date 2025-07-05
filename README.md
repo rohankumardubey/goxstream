@@ -31,6 +31,10 @@ Build and run real-time data pipelines with file, database, or Kafka sources and
 
 ## 🚀 Quick Start
 
+### Prerequisites
+
+- Go 1.19 or higher
+  
 ### 1. **Clone and Build**
 
 ```bash
