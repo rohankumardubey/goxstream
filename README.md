@@ -3,11 +3,6 @@
 GoXStream is an open-source, Flink-inspired **stream processing engine written in Go**—with a beautiful React dashboard for visual pipeline design, job submission, and history.
 Build and run real-time data pipelines with file, database, or Kafka sources and sinks.
 
-![GoXStream Dashboard Screenshot](./docs/screenshot-dashboard.png)
-![Visual Designer Screenshot](./docs/screenshot-designer.png)
-
----
-
 ## 🚀 Features
 
 - **Modular pipeline engine (in Go):** Compose pipelines from map, filter, reduce, window, time-window, and more
@@ -17,6 +12,13 @@ Build and run real-time data pipelines with file, database, or Kafka sources and
 - **Stateful operators and checkpointing** (coming soon!)
 - **React dashboard:** Visual DAG pipeline builder (drag/drop), job submission, job history, JSON preview
 - **Persistent job history (localStorage and soon, backend)**
+
+---
+
+### [GoXStream Dashboard]
+<img width="1427" alt="Screenshot 2025-07-05 at 8 46 39 PM" src="https://github.com/user-attachments/assets/82143bcc-f3cf-4168-8472-22cc381056c4" />
+<img width="1382" alt="Screenshot 2025-07-05 at 8 46 51 PM" src="https://github.com/user-attachments/assets/5c27497f-88b2-436f-81e2-553f4431b612" />
+<img width="1429" alt="Screenshot 2025-07-05 at 8 47 02 PM" src="https://github.com/user-attachments/assets/a4e71b5f-9b06-4e19-a3b4-53ec6425b92c" />
 
 ---
 
@@ -278,17 +280,11 @@ Paris,1,2024-07-04T15:00:10Z,1
 
 ### 🧑‍💻 Extending GoXStream
 
-_Add New Operators:
+_Add New Operators: Implement the Operator interface and add a factory to the operator registry._
 
-Implement the Operator interface and add a factory to the operator registry._
+_Support New Sources/Sinks: Implement a Source or Sink interface in internal/source or internal/sink._
 
-_Support New Sources/Sinks:
-
-Implement a Source or Sink interface in internal/source or internal/sink._
-
-_React UI Integration:
-
-Planned for interactive pipeline creation and monitoring._
+_React UI Integration: Planned for interactive pipeline creation and monitoring._
 
 ---
 
