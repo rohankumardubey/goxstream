@@ -23,8 +23,8 @@ func killProcess() {
 	if err != nil || len(out) == 0 {
 		return // Nothing running or lsof not available
 	}
-	pids := strings.Fields(string(out))
-	for _, pidStr := range pids {
+	p_ids := strings.Fields(string(out))
+	for _, pidStr := range p_ids {
 		pid, _ := strconv.Atoi(pidStr)
 		proc, _ := os.FindProcess(pid)
 		proc.Signal(syscall.SIGKILL)
